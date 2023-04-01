@@ -12,6 +12,8 @@ services:
             - ./xray/config:/etc/xray
             - ./xray/logs:/var/log/xray
             - ./cert:/home/root/cert
+        depends_on: 
+            - acme
         networks: 
             - dockernet
 
@@ -76,6 +78,7 @@ services:
             DEPLOY_DOCKER_CONTAINER_KEY_FILE: './.acme/ssl/all.1cc.top/1cc.top.key'
             DEPLOY_DOCKER_CONTAINER_FULLCHAIN_FILE: './.acme/ssl/all.1cc.top/fullchain.cer'
             DEPLOY_DOCKER_CONTAINER_RELOAD_CMD: 'nginx -s reload'
+            TZ: Asia/Shanghai
         volumes:
             - /usr/share/zoneinfo/Asia/Shanghai:/etc/localtime:ro
             - /var/run/docker.sock:/var/run/docker.sock:ro
@@ -90,8 +93,10 @@ services:
           acme.sh --installcert -d 1cc.top --key-file ~/docker-xray-web/cert/xray.key --fullchain-file ~/docker-xray-web/cert/xray.crt 
         # acme.sh --deploy -d sleele.com --deploy-hook docker
         # docker exec -i acme acme.sh --deploy -d sleele.com --deploy-hook docker
-
-
+        depends_on: 
+            - nginx
+        networks: 
+            - dockernet
 
 networks: 
     dockernet:
