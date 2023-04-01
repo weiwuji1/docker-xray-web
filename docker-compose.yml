@@ -31,6 +31,8 @@ services:
     web:
         image: nginx:alpine
         container_name: nginx
+        labels: 
+            - 'nginx'
         restart: always
         environment: 
             TZ: Asia/Shanghai
@@ -60,6 +62,36 @@ services:
             - ./dbdata:/var/lib/postgresql/data
         networks: 
             - dockernet
-        
+    acme:
+        image: neilpang/acme.sh
+        container_name: acme
+        restart: always
+        environment:
+          # CF_Token: '9-Xxz8XTJgvcfw4TK8lE4cgGOm9zF61ldWUQ0RYh'
+          # CF_Account_ID: 'xxx'
+          # CF_Zone_ID: 'f003b2aed5f5cb38a52de5ccd47e203c'
+            HE_Username: 'weiwuji'
+            HE_Password: 'xxx'
+            DEPLOY_DOCKER_CONTAINER_LABEL: 'nginx'
+            DEPLOY_DOCKER_CONTAINER_KEY_FILE: './.acme/ssl/all.1cc.top/1cc.top.key'
+            DEPLOY_DOCKER_CONTAINER_FULLCHAIN_FILE: './.acme/ssl/all.1cc.top/fullchain.cer'
+            DEPLOY_DOCKER_CONTAINER_RELOAD_CMD: 'nginx -s reload'
+        volumes:
+            - /usr/share/zoneinfo/Asia/Shanghai:/etc/localtime:ro
+            - /var/run/docker.sock:/var/run/docker.sock:ro
+            - ./.acme/acme.sh:/acme.sh
+            - ./nginx/cert:/etc/nginx/ssl
+        command: daemon
+        # 首次运行先进入容器生成证书
+          acme.sh --issue --dns dns_he -d 1cc.top -d *.1cc.top
+        # acme.sh --issue --dns dns_cf -d zha.li -d *.zha.li
+        # docker exec -i acme acme.sh --issue --dns dns_cf -d zha.li -d *.zha.li
+        # 然后部署证书到指定文件夹
+          acme.sh --installcert -d 1cc.top --key-file ~/docker-xray-web/cert/xray.key --fullchain-file ~/docker-xray-web/cert/xray.crt 
+        # acme.sh --deploy -d sleele.com --deploy-hook docker
+        # docker exec -i acme acme.sh --deploy -d sleele.com --deploy-hook docker
+
+
+
 networks: 
     dockernet:
