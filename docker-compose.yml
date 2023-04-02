@@ -1,7 +1,7 @@
 version: "3"
 services: 
     xray:
-        image: teddysun/xray
+        image: teddysun/xray:1.7.5
         container_name: xray
         restart: always
         environment: 
@@ -56,9 +56,9 @@ services:
         container_name: pgsql
         restart: always
         environment: 
-            # POSTGRES_USER: (Optional)
+            POSTGRES_USER: Your_UserName_here
             POSTGRES_PASSWORD: Your_Password_here
-            # POSTGRES_DB: (Optional)
+            POSTGRES_DB: Your_DbName_here
             TZ: Asia/Shanghai
         volumes:
             - ./dbdata:/var/lib/postgresql/data
@@ -75,22 +75,22 @@ services:
             HE_Username: 'weiwuji'
             HE_Password: 'xxx'
             DEPLOY_DOCKER_CONTAINER_LABEL: 'nginx'
-            DEPLOY_DOCKER_CONTAINER_KEY_FILE: './.acme/ssl/all.1cc.top/1cc.top.key'
-            DEPLOY_DOCKER_CONTAINER_FULLCHAIN_FILE: './.acme/ssl/all.1cc.top/fullchain.cer'
+            DEPLOY_DOCKER_CONTAINER_KEY_FILE: '/etc/nginx/ssl/xray.key'
+            DEPLOY_DOCKER_CONTAINER_FULLCHAIN_FILE: '/etc/nginx/ssl/xray.crt'
             DEPLOY_DOCKER_CONTAINER_RELOAD_CMD: 'nginx -s reload'
             TZ: Asia/Shanghai
         volumes:
             - /usr/share/zoneinfo/Asia/Shanghai:/etc/localtime:ro
             - /var/run/docker.sock:/var/run/docker.sock:ro
-            - ./.acme/acme.sh:/acme.sh
+            - ./acme/acme.sh:/acme.sh
             - ./nginx/cert:/etc/nginx/ssl
-        command: daemon
+        command: daemon && acme.sh --issue --dns dns_cf -d zha.li -d *.zha.li --dnssleep 1200 --force && acme.sh --deploy -d sleele.com --deploy-hook docker
         # 首次运行先进入容器生成证书
-          acme.sh --issue --dns dns_he -d 1cc.top -d *.1cc.top
+        # acme.sh --issue --dns dns_he -d 1cc.top -d *.1cc.top
         # acme.sh --issue --dns dns_cf -d zha.li -d *.zha.li
         # docker exec -i acme acme.sh --issue --dns dns_cf -d zha.li -d *.zha.li
         # 然后部署证书到指定文件夹
-          acme.sh --installcert -d 1cc.top --key-file ~/docker-xray-web/cert/xray.key --fullchain-file ~/docker-xray-web/cert/xray.crt 
+        # acme.sh --installcert -d 1cc.top --key-file ~/docker-xray-web/cert/xray.key --fullchain-file ~/docker-xray-web/cert/xray.crt 
         # acme.sh --deploy -d sleele.com --deploy-hook docker
         # docker exec -i acme acme.sh --deploy -d sleele.com --deploy-hook docker
         depends_on: 
