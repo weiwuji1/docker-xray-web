@@ -69,11 +69,11 @@ services:
         container_name: acme
         restart: always
         environment:
-          # CF_Token: '9-Xxz8XTJgvcfw4TK8lE4cgGOm9zF61ldWUQ0RYh'
-          # CF_Account_ID: 'xxx'
-          # CF_Zone_ID: 'f003b2aed5f5cb38a52de5ccd47e203c'
-            HE_Username: 'weiwuji'
-            HE_Password: 'xxx'
+            CF_Token: '9-Xxz8XTJgvcfw4TK8lE4cgGOm9zF61ldWUQ0RYh'
+            CF_Account_ID: 'xxx'
+            CF_Zone_ID: 'f003b2aed5f5cb38a52de5ccd47e203c'
+          # HE_Username: 'weiwuji'
+          # HE_Password: 'xxx'
             DEPLOY_DOCKER_CONTAINER_LABEL: 'nginx'
             DEPLOY_DOCKER_CONTAINER_KEY_FILE: '/etc/nginx/ssl/xray.key'
             DEPLOY_DOCKER_CONTAINER_FULLCHAIN_FILE: '/etc/nginx/ssl/xray.crt'
@@ -85,6 +85,8 @@ services:
             - ./acme/acme.sh:/acme.sh
             - ./nginx/cert:/etc/nginx/ssl
         command: daemon && acme.sh --issue --dns dns_cf -d zha.li -d *.zha.li --dnssleep 1200 --force && acme.sh --deploy -d sleele.com --deploy-hook docker
+        #command: /bin/bash -c "acme.sh --issue --dns dns_cf -d example.com -d www.example.com --keylength ec-256 --key-file /acme.sh/example.com/key.pem --fullchain-file /acme.sh/example.com/cert.pem --reloadcmd 'service nginx force-reload' --dnssleep 60 --challenge-alias example.com --config-home /acme.sh --log /acme.sh.log"
+        #command: /bin/bash -c "acme.sh --issue -d example.com -d www.example.com --standalone -k nginx && acme.sh --installcert -d example.com --key-file /acme.sh/example.com/key.pem --fullchain-file /acme.sh/example.com/cert.pem --reloadcmd 'service nginx force-reload'"
         # 首次运行先进入容器生成证书
         # acme.sh --issue --dns dns_he -d 1cc.top -d *.1cc.top
         # acme.sh --issue --dns dns_cf -d zha.li -d *.zha.li
