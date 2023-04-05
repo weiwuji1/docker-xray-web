@@ -56,9 +56,9 @@ services:
         container_name: pgsql
         restart: always
         environment: 
-            POSTGRES_USER: Your_UserName_here
-            POSTGRES_PASSWORD: Your_Password_here
-            POSTGRES_DB: Your_DbName_here
+            POSTGRES_USER: DB_USER
+            POSTGRES_PASSWORD: DB_PASS
+            POSTGRES_DB: DB_NAME
             TZ: Asia/Shanghai
         volumes:
             - ./dbdata:/var/lib/postgresql/data
