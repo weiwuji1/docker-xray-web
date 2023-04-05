@@ -33,8 +33,8 @@ services:
     web:
         image: nginx:alpine
         container_name: nginx
-        labels: 
-            - 'nginx'
+        labels:
+            - sh.acme.autoload.domain=example.com
         restart: always
         environment: 
             TZ: Asia/Shanghai
@@ -56,9 +56,9 @@ services:
         container_name: pgsql
         restart: always
         environment: 
-            POSTGRES_USER: Your_UserName_here
-            POSTGRES_PASSWORD: Your_Password_here
-            POSTGRES_DB: Your_DbName_here
+            POSTGRES_USER: DB_USER
+            POSTGRES_PASSWORD: DB_PASS
+            POSTGRES_DB: DB_NAME
             TZ: Asia/Shanghai
         volumes:
             - ./dbdata:/var/lib/postgresql/data
@@ -69,34 +69,19 @@ services:
         container_name: acme
         restart: always
         environment:
-            CF_Token: '9-Xxz8XTJgvcfw4TK8lE4cgGOm9zF61ldWUQ0RYh'
-            CF_Account_ID: 'xxx'
-            CF_Zone_ID: 'f003b2aed5f5cb38a52de5ccd47e203c'
-          # HE_Username: 'weiwuji'
-          # HE_Password: 'xxx'
-            DEPLOY_DOCKER_CONTAINER_LABEL: 'nginx'
+            CF_Token: 'cf_token'
+            CF_Account_ID: 'cf_account_id'
+            CF_Zone_ID: 'cf_zonet_id'
+            DEPLOY_DOCKER_CONTAINER_LABEL: 'sh.acme.autoload.domain=example.com'
             DEPLOY_DOCKER_CONTAINER_KEY_FILE: '/etc/nginx/ssl/xray.key'
             DEPLOY_DOCKER_CONTAINER_FULLCHAIN_FILE: '/etc/nginx/ssl/xray.crt'
-            DEPLOY_DOCKER_CONTAINER_RELOAD_CMD: 'nginx -s reload'
+            DEPLOY_DOCKER_CONTAINER_RELOAD_CMD: 'service nginx force-reload'
             TZ: Asia/Shanghai
         volumes:
-            - /usr/share/zoneinfo/Asia/Shanghai:/etc/localtime:ro
             - /var/run/docker.sock:/var/run/docker.sock:ro
             - ./acme/acme.sh:/acme.sh
             - ./nginx/cert:/etc/nginx/ssl
-        command: daemon && acme.sh --issue --dns dns_cf -d zha.li -d *.zha.li --dnssleep 1200 --force && acme.sh --deploy -d sleele.com --deploy-hook docker
-        #command: /bin/bash -c "acme.sh --issue --dns dns_cf -d example.com -d www.example.com --keylength ec-256 --key-file /acme.sh/example.com/key.pem --fullchain-file /acme.sh/example.com/cert.pem --reloadcmd 'service nginx force-reload' --dnssleep 60 --challenge-alias example.com --config-home /acme.sh --log /acme.sh.log"
-        #command: /bin/bash -c "acme.sh --issue -d example.com -d www.example.com --standalone -k nginx && acme.sh --installcert -d example.com --key-file /acme.sh/example.com/key.pem --fullchain-file /acme.sh/example.com/cert.pem --reloadcmd 'service nginx force-reload'"
-        # 首次运行先进入容器生成证书
-        # acme.sh --issue --dns dns_he -d 1cc.top -d *.1cc.top
-        # acme.sh --issue --dns dns_cf -d zha.li -d *.zha.li
-        # docker exec -i acme acme.sh --issue --dns dns_cf -d zha.li -d *.zha.li
-        # 然后部署证书到指定文件夹
-        # acme.sh --installcert -d 1cc.top --key-file ~/docker-xray-web/cert/xray.key --fullchain-file ~/docker-xray-web/cert/xray.crt 
-        # acme.sh --deploy -d sleele.com --deploy-hook docker
-        # docker exec -i acme acme.sh --deploy -d sleele.com --deploy-hook docker
-        depends_on: 
-            - nginx
+        command: daemon
         networks: 
             - dockernet
 
