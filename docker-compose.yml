@@ -81,8 +81,6 @@ services:
             - ./acme/acme.sh:/acme.sh
             - ./nginx/cert:/etc/nginx/ssl
         command: daemon
-        depends_on: 
-            - nginx
         networks: 
             - dockernet
 
